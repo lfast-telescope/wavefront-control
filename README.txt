@@ -1,0 +1,3 @@
+Shack Hartmann wavefront sensing and control for the LFAST telescope
+
+wavefront-sensing subfolder contains MATLAB code adapted from Yiyang Huang that processes .bmp files from a SH lenslet array into .mat wavefront sag maps. Upcoming subfolders will include interfaces to predict the TEC correction required for these wavefront maps. These will be used to create a feedforward model for the TEC correction.
