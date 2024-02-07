@@ -1,13 +1,14 @@
 clearvars; clc; close all;
 
-im_filename = 'C:\Users\warre\OneDrive\Documents\LFAST\on-sky\2024-01-10\WFS\20240110T2028_Almach.bmp';
+%Testbench for "wavefrontReconstruction.m"
+
 output_plots = false;
 zernikeTerms = [1,2,3,4];
 
-folder_path = 'C:\Users\warre\OneDrive\Documents\LFAST\on-sky\2024-01-10\WFS\TEC_off\';
+folder_path = 'C:\Users\warrenbfoster\Documents\LFAST\on-sky\20240118\';
 file_list = dir(folder_path);
 
-for iteration = 3:numel(file_list)
+for iteration = 3:10
     im_filename = file_list(iteration).name;
     [highOrderSurface,xCoordinates,yCoordinates] = wavefrontReconstruction(append(folder_path,im_filename),output_plots, zernikeTerms);
     

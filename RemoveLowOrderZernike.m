@@ -12,7 +12,8 @@ function [highOrderMap,fitCoeff] = RemoveLowOrderZernike(xCoordinates, yCoordina
 % HISTORY:
 %   2023-07-25 - Yiyang Huang - initial implementation
 %   2023-11-09 - Yiyang Huang - adapt to LFAST
-
+%   2024-01-12 - Warren Foster - enable plot suppression
+%   2024-01-15 - Yiyang Huang - encircle the low order map
 
 % Default Zernike terms to be removed.
 if nargin < 4

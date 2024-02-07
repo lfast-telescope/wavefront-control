@@ -1,5 +1,8 @@
 function [highOrderSurface, xCoordinates, yCoordinates] = wavefrontReconstruction(im_filename,output_plots, zernikeTerms, filename)
 
+%Representation of "test.m" as a function that can be used as an
+%executable. Warren Foster adapting code from Yiyang Huang
+
 if ischar(output_plots)
     if str2num(output_plots) == 0
         output_boolean = false;
@@ -19,15 +22,29 @@ if output_boolean
 end
 
 % Get parameters of the regular grid according to known bright spots.
-[referenceX, referenceY, magnification] = GetGrid(image, output_boolean);
+[referenceX, referenceY, magnification] = GetGrid(image, output_plots);
+magnification = 54; % magnification should be a constant for the same Shack-Hartmann wavefront sensor
 % Calculate the quiver.
-[arrows, idealCoords, ~] = GetQuiver(image, referenceX, referenceY, magnification, output_boolean);
+[arrows, idealCoords, ~] = GetQuiver(image, referenceX, referenceY, magnification, output_plots);
+
+% Calibrate slope data according to the quiver.
+s = 5.63116; % distance between 2 stars in pixels
+tanTheta = 5.5; % angular separation of 2 stars in arcseconds
+tanTheta = tanTheta * 4.848e-6; % angular separation in radians
+d = s / tanTheta; % calibrated distance in pixels between the lens array and sensor
+slope = 0.5 * arrows / d; % calibrated slope
 
 % Get the regular slope maps.
-slopeMagnification = 1; lateralMagnification = 1;
-integrationStep = 1;
+ptsNumX = (max(idealCoords(:,1)) - min(idealCoords(:,1))) / magnification;
+ptsNumY = (max(idealCoords(:,2)) - min(idealCoords(:,2))) / magnification;
+N = (ptsNumX + ptsNumY) / 2; % number of separations of micro lenses on the diameter
+slopeMagnification = 1; % equal to 1 once the slope is calibrated in previous sections
+mirrorDiameter = 30 * 25.4; % diameter of the primary mirror in millimeters
+actualSpacing = mirrorDiameter / N; % actual spacing on the primary mirror indicated by micro lenses
+lateralMagnification = actualSpacing / magnification; % actual spacing on the primary mirror covered by a pixel
+integrationStep = 3;
 [regularSlopeX,regularSlopeY,xCoordinates,yCoordinates] = ...
-    Quiver2RegularSlope(arrows,idealCoords,slopeMagnification, ...
+    Quiver2RegularSlope(slope,idealCoords,slopeMagnification, ...
     lateralMagnification,integrationStep);
 % yCoordinates = flip(yCoordinates); % correct the flipped y axis of the pixel coordinate system
 

@@ -8,6 +8,9 @@ function [referenceX, referenceY, magnification] = GetGrid(image,output_plots)
 %   magnification: magnification of the regular grid.
 % HISTORY:
 %   2023-12-13 - Yiyang Huang - initial implementation
+%   2024-01-16 - Warren Foster - add output plot suppression
+%   2024-01-18 - Yiyang Huang - change the way of determining magnification
+
 
 % Get pixel coordinates of bright spots.
 
@@ -54,7 +57,7 @@ sortedDist = sort(distance);
 croppedPercent = 0.1; % (!)
 croppedNum = round(croppedPercent*spotsNum);
 croppedDist = sortedDist(croppedNum+1:spotsNum-croppedNum);
-magnification = mean(croppedDist);
+magnification = max(croppedDist);
 % Find the central reference.
 rowAve = mean(rows); colAve = mean(cols);
 centralSpot = [colAve rowAve];
