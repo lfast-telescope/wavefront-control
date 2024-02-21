@@ -5,7 +5,7 @@ clearvars; clc; close all;
 output_plots = false;
 zernikeTerms = [1,2,3,4];
 
-folder_path = 'C:\Users\warrenbfoster\Documents\LFAST\on-sky\20240118\';
+folder_path = 'C:\Users\warrenbfoster\OneDrive - University of Arizona\Documents\LFAST\on-sky\20240118\';
 file_list = dir(folder_path);
 
 for iteration = 3:10

@@ -1,6 +1,6 @@
 clearvars; clc; close all;
 
-file_name = 'C:\Users\warrenbfoster\Documents\LFAST\on-sky\20240118\20240118T0228_mirfak_tecsoff.bmp';
+file_name = 'C:\Users\warrenbfoster\OneDrive - University of Arizona\Documents\LFAST\on-sky\20240118\20240118T0228_mirfak_tecsoff.bmp';
 output_plots = false;
 
 %function [highOrderSurface] = wavefrontReconstruction(im_filename,output_plots, zernikeTerms)
@@ -9,13 +9,35 @@ output_plots = false;
 imageColor = imread(file_name);
 image = rgb2gray(imageColor);
 
+%Crop image: locate pupil and center on array
+imCrop = CropImage(image);
+
 if output_plots
     figure, imshow(image,[]);
 end
 
+%Determine rotation correction to make spot field align with sensor array 
+angle_start = 0;
+angle_range = 1;
+
+for trial = [1:5]
+     best_angle = find_best_rotation(imCrop,angle_start,angle_range);
+     if (best_angle == angle_start + angle_range) || (best_angle == angle_start - angle_range)
+     else
+         angle_range = angle_range / 2;
+     end
+     angle_start = best_angle;
+end
+
+image = imrotate(imCrop,best_angle);
+
+
 % Get parameters of the regular grid according to known bright spots.
 [referenceX, referenceY, magnification] = GetGrid(image, output_plots);
-magnification = 54; % magnification should be a constant for the same Shack-Hartmann wavefront sensor
+
+if false
+    magnification = 54; % magnification should be a constant for the same Shack-Hartmann wavefront sensor
+end
 % Calculate the quiver.
 [arrows, idealCoords, ~] = GetQuiver(image, referenceX, referenceY, magnification, output_plots);
 
@@ -34,6 +56,9 @@ slopeMagnification = 1; % equal to 1 once the slope is calibrated in previous se
 mirrorDiameter = 30 * 25.4; % diameter of the primary mirror in millimeters
 actualSpacing = mirrorDiameter / N; % actual spacing on the primary mirror indicated by micro lenses
 lateralMagnification = actualSpacing / magnification; % actual spacing on the primary mirror covered by a pixel
+
+%Start here tomorrow
+
 integrationStep = 3;
 [regularSlopeX,regularSlopeY,xCoordinates,yCoordinates] = ...
     Quiver2RegularSlope(slope,idealCoords,slopeMagnification, ...
@@ -79,4 +104,4 @@ xCentered = xCoordinates - mean(xCoordinates(:));
 yCentered = yCoordinates - mean(yCoordinates(:));
 yCentered = flip(yCentered);
 zernikeTerms = [1,2,3,4];
-[removedSurface,fitCoeff] = RemoveLowOrderZernike(xCentered, yCentered, shapeDiff, zernikeTerms, output_plots);
+[highOrderMap,fitCoeff] = RemoveLowOrderZernike(xCentered, yCentered, shapeDiff, zernikeTerms, output_plots);
