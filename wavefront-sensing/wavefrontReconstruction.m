@@ -14,8 +14,13 @@ else
 end
 
 % Read the image.
-imageColor = imread(im_filename);
-image = rgb2gray(imageColor);
+imageColor = imread(string(im_filename));
+
+if numel(size(imageColor))==3
+    image = rgb2gray(imageColor);
+else
+    image = imageColor;
+end
 % 
 if output_boolean
     figure, imshow(image,[]);
